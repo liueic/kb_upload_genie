@@ -1,195 +1,235 @@
-# KB Upload Genie - GitHub上传分类智能前端系统
+# KB Upload Genie - 容器化部署指南
 
 ## 项目概述
 
-KB Upload Genie 是一个智能化的GitHub仓库内容上传分类系统，专为小白用户设计，集成多种AI模型进行内容审核、自动分类和质量评估。
+KB Upload Genie 是一个前后端分离的GitHub上传分类智能系统，支持邮件附件上传、文件管理、用户认证等功能。本项目采用Docker容器化部署方案，确保在云服务器环境中稳定运行。
 
-## 核心功能
+## 技术架构
 
-- 🤖 **AI智能审核**: 集成GLM4.5、Gemini 2.5、Moonshot Kimi、StepFun Step系列模型
-- 📁 **自动分类**: 基于内容智能推荐分类目录
-- 📊 **质量评估**: 内容质量打分和改进建议
-- 🔒 **版权管理**: 版权状态检测和合规性检查
-- �️ **安全防护**: 集成Cloudflare Turnstile防止机器人攻击
-- �🚀 **GitHub集成**: 自动上传到指定GitHub仓库
-- 👥 **用户友好**: 专为小白用户设计的简洁界面
-
-## 架构图
-<img width="1244" height="748" alt="image" src="https://github.com/user-attachments/assets/ab458067-2dd6-42a1-a8ab-46a06f89bd28" />
-
-
-## 技术栈
-
-### 前端
-- **框架**: React 18 + TypeScript
-- **UI库**: Ant Design 5.x
-- **构建工具**: Vite
-- **状态管理**: Zustand
-- **编辑器**: Monaco Editor + Quill
-- **HTTP客户端**: Axios + React Query
-
-### 后端
-- **框架**: FastAPI + Python 3.11
-- **数据库**: PostgreSQL + SQLAlchemy
-- **缓存**: Redis
-- **异步任务**: Celery
-- **认证**: JWT + OAuth2
-
-### DevOps
+- **后端**: FastAPI + Python 3.11 + uvicorn
+- **前端**: React + TypeScript + Vite + Nginx
+- **数据库**: PostgreSQL 15
+- **缓存**: Redis 7
 - **容器化**: Docker + Docker Compose
-- **CI/CD**: GitHub Actions
-- **监控**: Prometheus + Grafana
-- **日志**: ELK Stack
+- **架构**: 统一容器部署（前端+后端+Nginx）
 
-## 快速开始
+## 部署方案
 
-### 环境要求
+### 方案一：本地构建部署
 
-- Node.js 18+
-- Python 3.11+
-- Docker & Docker Compose
-- PostgreSQL 15+
-- Redis 7+
+适用于开发环境或小规模部署：
 
-### 开发环境启动
-
-1. **克隆项目**
-   ```bash
-   git clone https://github.com/PancrePal-xiaoyibao/kb_upload_genie.git
-   cd kb_upload_genie
-   ```
-
-2. **环境配置**
-   ```bash
-   # 复制环境变量配置文件
-   cp backend/.env.example backend/.env
-   # 编辑配置文件，填入必要的API密钥和Turnstile配置
-   
-   # Turnstile配置 (可选，用于防机器人攻击)
-   # 1. 访问 https://dash.cloudflare.com/?to=/:account/turnstile
-   # 2. 创建新站点获取Site Key和Secret Key
-   # 3. 在.env文件中配置：
-   #    TURNSTILE_ENABLED=true
-   #    TURNSTILE_SITE_KEY=your-site-key
-   #    TURNSTILE_SECRET_KEY=your-secret-key
-   ```
-
-3. **使用Docker启动**
-   ```bash
-   # 启动所有服务
-   docker-compose up -d
-   
-   # 查看服务状态
-   docker-compose ps
-   ```
-
-4. **访问应用**
-   - 前端: http://localhost:3000
-   - 后端API: http://localhost:8000
-   - API文档: http://localhost:8000/docs
-   - Celery监控: http://localhost:5555
-
-### 手动启动 (开发模式)
-
-1. **后端启动**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-2. **前端启动**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-## 项目结构
-
-```
-kb_upload_genie/
-├── frontend/                 # 前端React应用
-│   ├── src/
-│   │   ├── components/      # 可复用组件
-│   │   ├── pages/          # 页面组件
-│   │   ├── hooks/          # 自定义Hook
-│   │   ├── utils/          # 工具函数
-│   │   └── styles/         # 样式文件
-│   ├── public/             # 静态资源
-│   └── package.json
-├── backend/                  # 后端FastAPI应用
-│   ├── app/
-│   │   ├── api/            # API路由
-│   │   ├── models/         # 数据模型
-│   │   ├── services/       # 业务逻辑
-│   │   ├── ai_services/    # AI服务集成
-│   │   └── auth/           # 认证模块
-│   ├── tests/              # 测试文件
-│   └── requirements.txt
-├── docker/                   # Docker配置
-│   ├── nginx/              # Nginx配置
-│   └── postgres/           # PostgreSQL初始化
-├── docs/                     # 项目文档
-├── tests/                    # 集成测试
-├── .github/workflows/        # CI/CD配置
-├── docker-compose.yml        # 开发环境
-├── docker-compose.prod.yml   # 生产环境
-└── README.md
-```
-
-## 开发指南
-
-### 代码规范
-
-- **前端**: ESLint + Prettier + TypeScript
-- **后端**: Black + isort + flake8 + mypy
-- **提交**: Conventional Commits
-
-### 测试策略
-
-- **单元测试**: Jest (前端) + pytest (后端)
-- **集成测试**: API测试 + 数据库测试
-- **端到端测试**: Playwright
-- **覆盖率要求**: 80%+
-
-### Git工作流
-
-1. 从 `develop` 分支创建功能分支
-2. 完成开发并通过所有测试
-3. 创建Pull Request到 `develop`
-4. 代码审查通过后合并
-5. 定期从 `develop` 合并到 `main` 进行发布
-
-## 部署说明
-
-### 开发环境
 ```bash
-docker-compose up -d
+# 克隆项目
+git clone <your-repository-url>
+cd kb_upload_genie
+
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，修改数据库密码、Redis密码等配置
+
+# 一键部署
+./deploy.sh start
 ```
 
-### 生产环境
+### 方案二：云端构建部署
+
+适用于生产环境，推荐使用：
+
+#### 1. 构建和推送镜像
+
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+# 在开发机器上构建并推送镜像
+./build-and-push.sh registry.cn-hangzhou.aliyuncs.com/your-namespace latest
+
+# 或者使用自定义参数
+./build-and-push.sh your-registry.com/your-namespace v1.0.0
 ```
 
-## 贡献指南
+#### 2. 在服务器上部署
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+```bash
+# 在服务器上配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，设置 APP_IMAGE 为你的镜像地址
+# APP_IMAGE=registry.cn-hangzhou.aliyuncs.com/your-namespace/kb-upload-genie:latest
 
-## 许可证
+# 启动服务
+./deploy.sh start
+```
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+## 环境配置
 
-## 联系方式
+### 必需配置项
 
-- 项目地址: https://github.com/PancrePal-xiaoyibao/kb_upload_genie
-- 问题反馈: https://github.com/PancrePal-xiaoyibao/kb_upload_genie/issues
+```bash
+# 数据库配置
+POSTGRES_DB=kb_upload_genie
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
 
-## 更新日志
+# Redis配置
+REDIS_PASSWORD=your_redis_password_here
 
-查看 [CHANGELOG.md](CHANGELOG.md) 了解版本更新详情。
+# 应用配置
+SECRET_KEY=your_very_long_and_secure_secret_key_here
+ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
+
+# 镜像配置（云端部署时使用）
+APP_IMAGE=registry.cn-hangzhou.aliyuncs.com/your-namespace/kb-upload-genie:latest
+```
+
+### 可选配置项
+
+```bash
+# 邮件上传功能
+EMAIL_UPLOAD_ENABLED=true
+IMAP_SERVER=imap.gmail.com
+EMAIL_ADDRESS=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+
+# AI功能
+OPENAI_API_KEY=your-openai-api-key
+```
+
+## 服务访问
+
+部署成功后，可通过以下地址访问：
+
+- **前端管理界面**: http://your-server-ip
+- **后端API文档**: http://your-server-ip/docs
+- **健康检查**: http://your-server-ip/health
+
+## 部署脚本命令
+
+```bash
+# 启动所有服务
+./deploy.sh start
+
+# 停止所有服务
+./deploy.sh stop
+
+# 重启所有服务
+./deploy.sh restart
+
+# 查看服务状态
+./deploy.sh status
+
+# 查看服务日志
+./deploy.sh logs
+
+# 检查服务健康状态
+./deploy.sh health
+
+# 备份数据
+./deploy.sh backup
+
+# 清理Docker资源
+./deploy.sh cleanup
+```
+
+## 架构特点
+
+### 统一容器设计
+
+- **单一容器**: 前端静态文件和后端API服务打包在同一容器中
+- **Nginx反向代理**: 容器内使用Nginx处理静态文件服务和API代理
+- **Supervisor进程管理**: 使用supervisor管理Nginx和FastAPI两个进程
+- **单端口暴露**: 只对外暴露80端口，简化网络配置
+
+### 多阶段构建优化
+
+- **前端构建阶段**: 使用Node.js 18构建React应用
+- **运行时阶段**: 使用Python 3.11-slim作为运行时基础镜像
+- **镜像优化**: 通过.dockerignore和多阶段构建减少镜像体积
+
+### 生产环境特性
+
+- **健康检查**: 内置应用健康检查机制
+- **日志管理**: 统一的日志收集和管理
+- **安全配置**: 非root用户运行，安全头配置
+- **数据持久化**: 使用Docker volumes持久化数据
+
+## 故障排除
+
+### 常见问题
+
+1. **构建失败 - ARM64架构问题**
+   ```bash
+   # 如果在ARM64 Mac上构建失败，确保使用正确的Node.js版本
+   # Dockerfile已配置使用node:18-alpine解决兼容性问题
+   ```
+
+2. **服务启动失败**
+   ```bash
+   # 检查环境变量配置
+   ./deploy.sh status
+   
+   # 查看详细日志
+   ./deploy.sh logs
+   ```
+
+3. **数据库连接失败**
+   ```bash
+   # 确保数据库服务正常启动
+   docker-compose ps postgres
+   
+   # 检查数据库连接
+   docker-compose exec postgres pg_isready
+   ```
+
+## 监控和维护
+
+### 日志查看
+
+```bash
+# 查看所有服务日志
+./deploy.sh logs
+
+# 查看特定服务日志
+./deploy.sh logs app
+./deploy.sh logs postgres
+./deploy.sh logs redis
+```
+
+### 数据备份
+
+```bash
+# 创建数据备份
+./deploy.sh backup
+
+# 备份文件位置
+ls -la backups/
+```
+
+### 服务更新
+
+```bash
+# 更新镜像
+./build-and-push.sh your-registry/kb-upload-genie new-version
+
+# 更新环境变量中的镜像版本
+# APP_IMAGE=your-registry/kb-upload-genie:new-version
+
+# 重启服务
+./deploy.sh restart
+```
+
+## 安全建议
+
+1. **修改默认密码**: 确保修改数据库和Redis的默认密码
+2. **使用HTTPS**: 在生产环境中配置SSL证书
+3. **防火墙配置**: 只开放必要的端口
+4. **定期备份**: 设置定期数据备份策略
+5. **监控告警**: 配置服务监控和告警机制
+
+## 技术支持
+
+如遇到部署问题，请检查：
+
+1. Docker和Docker Compose版本兼容性
+2. 服务器资源是否充足（内存、磁盘空间）
+3. 网络连接是否正常
+4. 环境变量配置是否正确
+
+更多技术细节请参考项目文档或提交Issue。
